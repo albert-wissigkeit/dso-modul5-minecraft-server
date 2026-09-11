@@ -1,1 +1,2 @@
-java -Xmx4G -Xms4G -jar minecraft_server.26.2.jar nogui
+echo "eula=true" > eula.txt
+java -Xmx4G -Xms4G -jar server.jar nogui

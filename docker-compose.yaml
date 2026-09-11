@@ -6,9 +6,6 @@ services:
       dockerfile: Dockerfile
     ports:
     - 8888:25565
-    environment:
-    - APPLICATION_PORT=8888
-    - EULA=TRUE
     volumes:
       - mc-server-data:/app/
     restart: always
