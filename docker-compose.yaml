@@ -1,0 +1,17 @@
+services:
+  mc-server:
+    image: mc-server
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+    - 8888:25565
+    environment:
+    - APPLICATION_PORT=8888
+    - EULA=TRUE
+    volumes:
+      - mc-server-data:/app/
+    restart: always
+
+volumes:
+  mc-server-data: 
