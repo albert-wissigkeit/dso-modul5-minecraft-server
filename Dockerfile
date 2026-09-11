@@ -4,6 +4,8 @@ WORKDIR /app
 
 COPY . /app
 
+RUN chmod +x /app/entrypoint.sh
+
 ENV APPLICATION_PORT=25565
 
 EXPOSE ${APPLICATION_PORT}
