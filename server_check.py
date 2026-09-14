@@ -1,9 +1,15 @@
+import os
+
+from dotenv import load_dotenv
 from mcstatus import JavaServer
 
+load_dotenv()
+
+ip = os.getenv("SERVER_IP")
+port = os.getenv("SERVER_PORT")
 # You can pass the same address you'd enter into the address field in minecraft into the 'lookup' function
 # If you know the host and port, you may skip this and use JavaServer("example.org", 1234)
-server = JavaServer.lookup("<your_ip>:8888") # your VM server
-# server = JavaServer.lookup("localhost:8888") # your local server
+server = JavaServer.lookup(f"{ip}:{port}") # your server
 
 # 'status' is supported by all Minecraft servers that are version 1.7 or higher.
 # Don't expect the player list to always be complete, because many servers run
