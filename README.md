@@ -30,47 +30,60 @@ cd dso-modul5-minecraft-server
 git checkout setup-minecraft-server # switch branch if needed
 ```
 
-2. **Start the server:**
+2. **Configure environment variables:**
+
+```bash
+cp .env.template .env
+```
+
+> [!NOTE]
+> Adjust the settings inside the `.env` file to your needs, at minimum you must set MC_EULA=true (required to start the server).
+
+3. **Start the server:**
 
 ```bash
 docker compose up --build -d
 ```
 
-3. **Verify the server is running:**
+4. **Verify the server is running:**
 
 ```bash
 docker ps
 ```
 
-> Note: _Alternatively, use the `server_check.py` script (adjust the IP address in the script first)._
+> [!NOTE]
+> Alternatively, use the `server_check.py` script to ping the Server. For more information see [Server Check Script](#server-check-script) below.
 
-4. **(Optional) To Test automatic restart of the Server:**
+5. **(Optional) To Test automatic restart of the Server:**
 
 ```bash
 sudo reboot
 ```
 
-> Note: _Since `restart: always` is configured, the container will automatically start again after a reboot._
+> [!NOTE]
+> Since the restart policy is configured, the container will automatically start again after a reboot.
 
-5. **Stop the server:**
+6. **Stop the server:**
 
 ```bash
-docker compose down
+docker compose down # (Add `-v` if you want to completely delete the server data/volume).
 ```
-
-> Note: _(Add `-v` if you want to completely delete the server data/volume)._
 
 ---
 
 ## Repository Structure
 
-- `docker-compose.yaml`: Defines the Docker service, port mapping, data persistence (volumes), and auto-restart policies.
-- `Dockerfile`: Instructions to build the Docker image. It uses `eclipse-temurin:25` (Java), copies the files, sets the working directory, exposes the port, and defines the entrypoint.
-- `entrypoint.sh`: A shell script executed when the container starts. It automatically accepts the Minecraft EULA and starts the `server.jar` with specified RAM allocation.
-- `server.jar`: The executable Minecraft server file (downloaded from the official [website](https://www.minecraft.net/de-de/download/server) ).
+- `docker-compose.yaml`: Defines the Docker service, port mapping, data persistence (volumes), auto-restart policies, and environment variables.
+- `Dockerfile`: Instructions to build the Docker image. It uses `eclipse-temurin:25-alpine` (Java), copies the files, sets the working directory, exposes the port, and defines the entrypoint.
+- `entrypoint.sh`: A shell script executed when the container starts. It automatically accepts the Minecraft EULA, applies configuration settings from `.env` to `server.properties`, and starts the `server.jar` with specified RAM allocation.
+- `server.jar`: The executable Minecraft server file (downloaded from the official [website](https://www.minecraft.net/de-de/download/server)).
+- `server.properties`: Base configuration file for the Minecraft server.
+- `.env.template`: Template file containing environment variables for server settings and `server.properties`.
+- `.env`: Local environment configuration (created from `.env.template`).
+- `.dockerignore`: Excludes unnecessary files and directories (like `.venv` or caches) from the Docker build context.
 - `server_check.py`: A Python script utilizing the [mcstatus](https://github.com/py-mine/mcstatus) library to ping and query the server.
-- `requirements.txt`: Contains the Python dependencies (`mcstatus`, `asyncio-dgram`, `dnspython`) needed to run `server_check.py`.
-- `.gitignore`: Ensures temporary files (like `.venv` or caches) are not pushed to the repository.
+- `requirements.txt`: Contains the Python dependencies (`mcstatus`, `asyncio-dgram`, `dnspython`, `python-dotenv`) needed to run `server_check.py`.
+- `.gitignore`: Ensures temporary files are not pushed to the repository.
 
 ---
 
@@ -78,15 +91,10 @@ docker compose down
 
 ### Modifying Server Settings
 
-You can customize the server behavior by modifying the provided files:
+You can customize the server behavior easily using the `.env` file:
 
-- **Change Ports:**
-  Open `docker-compose.yaml` and change the left side of the `ports` mapping.
-  For example, to use the default Minecraft port on your host machine:
-  `- 25565:25565` (Format is `HOST:CONTAINER`).
-- **Adjust RAM Allocation:**
-  Open `entrypoint.sh` and modify the Java arguments.
-  `-Xmx2G -Xms2G` assigns a maximum and minimum of 2 Gigabytes of RAM. Change `2G` to `4G` if you need 4 Gigabytes, etc.
+* **Environment Configuration:**
+Copy `.env.template` to `.env` and modify variables such as RAM allocation, port mappings, and `server.properties` settings (e.g., MOTD, max players, difficulty). The `entrypoint.sh` script applies these settings automatically on startup.
 
 ### The Minecraft EULA (End User License Agreement)
 
@@ -109,13 +117,7 @@ source .venv/bin/activate  # On Windows use: .venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-2. Modify `server_check.py` to target your IP:
-
-```python
-server = JavaServer.lookup("<your_ip>:8888")
-```
-
-3. Run the script:
+2. Run the script:
 
 ```bash
 python server_check.py
@@ -129,7 +131,7 @@ Here are additional commands for managing your container and images:
 
 ```bash
 # Build the image manually without compose
-docker build -t  -f ./Dockerfile .
+docker build -t mc-server -f ./Dockerfile .
 
 # List all local Docker images
 docker image ls
