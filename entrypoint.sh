@@ -15,4 +15,4 @@ else
    echo "You must set the EULA to true in .env, otherwise nothing will start!"
    exit 0
 fi
-java -Xmx2G -Xms2G -jar server.jar nogui
+java -Xmx${MAX_RAM}G -Xms${START_RAM}G -jar server.jar nogui
