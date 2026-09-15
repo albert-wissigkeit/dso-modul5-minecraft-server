@@ -1,0 +1,16 @@
+services:
+  mc-server:
+    image: mc-server
+    build:
+      context: .
+      dockerfile: Dockerfile
+    env_file: 
+    - .env
+    ports:
+    - 8888:25565
+    volumes:
+      - mc-server-data:/app/
+    restart: on-failure
+
+volumes:
+  mc-server-data: 
